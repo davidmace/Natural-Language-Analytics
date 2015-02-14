@@ -1,0 +1,134 @@
+<!doctype html>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <title>amMap example</title>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+        <script type="text/javascript" src="http://www.amcharts.com/lib/3/amcharts.js"></script>
+<script type="text/javascript" src="http://www.amcharts.com/lib/3/serial.js"></script>
+<script type="text/javascript" src="http://www.amcharts.com/lib/3/themes/none.js"></script> 
+        <!-- map file should be included after ammap.js -->
+    <script type="text/javascript">
+
+
+function httpGet(theUrl)
+      {
+        var xmlHttp = null;
+
+        xmlHttp = new XMLHttpRequest();
+        xmlHttp.open( "GET", theUrl, false );
+        xmlHttp.send( null );
+        return xmlHttp.responseText;
+      }
+
+function makeAnswer(results) {
+    window.onload = function () {
+        var div = document.getElementById('ans');
+        div.innerHTML = div.innerHTML + results[0];
+        div.removeAttribute("hidden");
+    };
+}
+
+function makeChart(results) {
+    console.log('yooooo')
+        window.onload = function () {
+            console.log('adsf')
+          var div = document.getElementById('chartdiv');
+          div.removeAttribute("hidden");
+
+          var chartData = [];
+          for(i=0; i<results.length; i++) {
+            var vals=results[i].split('+=+')
+            if(vals.length<2) continue
+            if(vals.length==2) {
+              chartData.push({
+                "x": ""+vals[0],
+                "y1": parseInt(vals[1])
+              });
+            }
+            else if(vals.length==3) {
+              chartData.push({
+                "x": ""+vals[0],
+                "y1": vals[1],
+                "y2": vals[2]
+              });
+            }
+          }
+
+          console.log(chartData);
+
+          var chart = AmCharts.makeChart("chartdiv", {
+            "type": "serial",
+            "theme": "none",
+            "dataProvider": chartData,
+            "valueAxes": [{
+                "gridColor":"#FFFFFF",
+            "gridAlpha": 0.2,
+            "dashLength": 0
+            }],
+            "gridAboveGraphs": true,
+            "startDuration": 1,
+            "valueAxes": [{
+        "stackType": "regular",
+        "axisAlpha": 0.3,
+        "gridAlpha": 0
+    }],
+            "graphs": [{
+                "balloonText": "[[category]]: <b>[[value]]</b>",
+                "fillAlphas": 0.8,
+                "lineAlpha": 0.2,
+                "type": "column",
+                "valueField": "y1"    
+            },
+            {
+                "balloonText": "[[category]]: <b>[[value]]</b>",
+                "fillAlphas": 0.8,
+                "lineAlpha": 0.2,
+                "type": "column",
+                "valueField": "y2"    
+            }],
+            "chartCursor": {
+                "categoryBalloonEnabled": false,
+                "cursorAlpha": 0,
+                "zoomable": false
+            },
+            "categoryField": "x",
+            "categoryAxis": {
+                "gridPosition": "start",
+                "gridAlpha": 0,
+                 "tickPosition":"start",
+                 "tickLength":20
+            },
+            "exportConfig":{
+              "menuTop": 0,
+              "menuItems": [{
+                "icon": '/lib/3/images/export.png',
+                "format": 'png'   
+                }]  
+            }
+          });
+         };
+        }
+
+var lines = httpGet('/query2?s=<%-query%>').split('\n');
+      var plotinfo=lines[0].split(',');
+      var results = lines.slice(1);
+      console.log(results)
+      if(plotinfo=='answer')
+        makeAnswer(results)
+      else
+        makeChart(results);
+
+        </script>
+
+    </script>
+    </head>
+
+    <body>
+        <div id="chartdiv" style="width: 100%; background-color:#EEEEEE; height: 500px;" hidden></div>
+        <div id="ans" hidden></div>
+    </body>
+
+</html>
